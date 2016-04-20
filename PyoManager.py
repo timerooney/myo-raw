@@ -165,6 +165,11 @@ def LoadAllScripts():
     global modulelist
     global scriptlist
     global modulenamelist
+    
+    for n, m in modulelist.iteritems():
+      if m and m.onOff and m.onOff is not None:
+        m.onOff()
+
     modulelist = {}
     modulenamelist = []
     myo.clear_handle_lists()
@@ -176,6 +181,8 @@ def LoadAllScripts():
             if emod:
                 modulelist[ei] = emod
                 modulenamelist.append(mname)
+                if emod and emod.onOff and emod.onOff is not None:
+                  emod.onOn()
 
 
 def SetOnOffScript(arg):
