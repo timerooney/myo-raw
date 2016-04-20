@@ -8,7 +8,7 @@ import webbrowser
 import importlib
 import ConfigParser
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
-from PyoConnectLib import *
+from PyoConnect import *
 myo = Myo(sys.argv[1] if len(sys.argv) >= 2 else None)
 cfg = ConfigParser.SafeConfigParser()
 scriptlist = []
