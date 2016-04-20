@@ -1,3 +1,12 @@
+'''
+	Original by dzhu
+		https://github.com/dzhu/myo-raw
+
+	Edited by Fernando Cosentino
+		http://www.fernandocosentino.net/pyoconnect
+'''
+
+
 from __future__ import print_function
 
 import enum
@@ -320,7 +329,7 @@ class MyoRaw(object):
         '''
 
         self.write_attr(0x28, b'\x01\x00')
-        self.write_attr(0x19, b'\x01\x03\x01\x01\x00')
+        #self.write_attr(0x19, b'\x01\x03\x01\x01\x00')
         self.write_attr(0x19, b'\x01\x03\x01\x01\x01')
 
     def mc_start_collection(self):

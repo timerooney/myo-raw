@@ -1,15 +1,5 @@
-#!/usr/bin/python
-''' DON'T TOUCH THESE FIRST LINES! '''
-''' ============================== '''
-from PyoConnect import *
-myo = Myo(sys.argv[1] if len(sys.argv) >= 2 else None) 
-''' ============================== '''
-
-''' OK, edit below to make your own fancy script ^.^ '''
-
-# Edit here:
-
-
+scriptTitle = "Video Control"
+scriptDescription = "A simple script to control video players"
 
 def onPoseEdge(pose, edge):
 	# active at all times
@@ -32,14 +22,3 @@ def onPoseEdge(pose, edge):
 
 
 
-# Stop editting
-
-# Comment out below the events you are not using
-myo.onPoseEdge = onPoseEdge
-
-''' DON'T TOUCH BELOW THIS LINE! '''
-''' ============================ '''
-myo.connect()
-while True:
-	myo.run()
-	myo.tick()
