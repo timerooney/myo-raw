@@ -167,7 +167,7 @@ def LoadAllScripts():
     global modulenamelist
     
     for n, m in modulelist.iteritems():
-      if m and m.onOff and m.onOff is not None:
+      if m and 'onOff' in dir(m) and m.onOff is not None and callable(getattr(m,'onOff')):
         m.onOff()
 
     modulelist = {}
@@ -181,7 +181,7 @@ def LoadAllScripts():
             if emod:
                 modulelist[ei] = emod
                 modulenamelist.append(mname)
-                if emod and emod.onOff and emod.onOff is not None:
+                if emod and 'onOn' in dir(emod) and emod.onOn is not None and callable(getattr(emod,'onOn')):
                   emod.onOn()
 
 
