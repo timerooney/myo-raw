@@ -91,18 +91,46 @@ class Myo(MyoRaw):
         self.add_pose_handler(self.pose_handler)
         self.onEMG = None
         self.onPoseEdge = None
+        self.onPoseEdgeList = []
         self.onLock = None
+        self.onLockList = []
         self.onUnlock = None
+        self.onUnlockList = []
         self.onPeriodic = None
+        self.onPeriodicList = []
         self.onWear = None
+        self.onWearList = []
         self.onUnwear = None
+        self.onUnwearList = []
         self.onBoxChange = None
+        self.onBoxChangeList = []
+
+    def check_myo_around(self):
+        self.bt.end_scan()
+        self.bt.disconnect(0)
+        self.bt.disconnect(1)
+        self.bt.disconnect(2)
+        self.bt.discover()
+        p = self.bt.recv_packet(1)
+        try:
+            pl = p.payload
+        except:
+            pl = ''
+
+        if pl.endswith('\x06BH\x12J\x7f,HG\xb9\xde\x04\xa9\x01\x00\x06\xd5'):
+            self.bt.end_scan()
+            return True
+        else:
+            return False
 
     def tick(self):
         now = time.time()
         if now - self.last_tick >= 0.01:
             if self.onPeriodic != None:
                 self.onPeriodic()
+            for h in self.onPeriodicList:
+                h()
+
             if self.use_lock and self.locked == False and self.timed:
                 if self.time_to_lock <= 0:
                     print('Locked')
@@ -111,9 +139,43 @@ class Myo(MyoRaw):
                     self.time_to_lock = self.lock_time
                     if self.onLock != None:
                         self.onLock()
+                    for h in self.onLockList:
+                        h()
+
                 else:
                     self.time_to_lock -= 0.01
             self.last_tick = now
+
+    def clear_handle_lists(self):
+        self.onPoseEdgeList = []
+        self.onLockList = []
+        self.onUnlockList = []
+        self.onPeriodicList = []
+        self.onWearList = []
+        self.onUnwearList = []
+        self.onBoxChangeList = []
+        self.emg_handlers = []
+
+    def Add_onPoseEdge(self, h):
+        self.onPoseEdgeList.append(h)
+
+    def Add_onLock(self, h):
+        self.onLockList.append(h)
+
+    def Add_onUnlock(self, h):
+        self.onUnlockList.append(h)
+
+    def Add_onPeriodic(self, h):
+        self.onPeriodicList.append(h)
+
+    def Add_onWear(self, h):
+        self.onWearList.append(h)
+
+    def Add_onUnwear(self, h):
+        self.onUnwearList.append(h)
+
+    def Add_onBoxChange(self, h):
+        self.onBoxChangeList.append(h)
 
     def emg_handler(self, emg, moving):
         if self.onEMG != None:
@@ -135,8 +197,14 @@ class Myo(MyoRaw):
         if Arm(arm) == 0:
             if self.onUnwear != None:
                 self.onUnwear()
-        elif self.onWear != None:
-            self.onWear(self.current_arm, self.current_xdir)
+            for h in self.onUnwearList:
+                h()
+
+        else:
+            if self.onWear != None:
+                self.onWear(self.current_arm, self.current_xdir)
+            for h in self.onWearList:
+                h(self.current_arm, self.current_xdir)
 
     def imu_handler(self, quat, acc, gyro):
         q0, q1, q2, q3 = quat
@@ -144,14 +212,22 @@ class Myo(MyoRaw):
         q1 = q1 / 16384.0
         q2 = q2 / 16384.0
         q3 = q3 / 16384.0
-        self.current_gyro = gyro
-        self.current_accel = acc
         self.current_roll = math.atan2(2.0 * (q0 * q1 + q2 * q3), 1.0 - 2.0 * (q1 * q1 + q2 * q2))
         self.current_pitch = -math.asin(max(-1.0, min(1.0, 2.0 * (q0 * q2 - q3 * q1))))
         self.current_yaw = -math.atan2(2.0 * (q0 * q3 + q1 * q2), 1.0 - 2.0 * (q2 * q2 + q3 * q3))
         self.current_rot_roll = self.angle_dif(self.current_roll, self.center_roll)
         self.current_rot_yaw = self.angle_dif(self.current_yaw, self.center_yaw)
         self.current_rot_pitch = self.angle_dif(self.current_pitch, self.center_pitch)
+        g0, g1, g2 = gyro
+        g0 = g0 / 16.0
+        g1 = g1 / 16.0
+        g2 = g2 / 16.0
+        self.current_gyro = (g0, g1, g2)
+        ac0, ac1, ac2 = acc
+        ac0 = ac0 / 2048.0
+        ac1 = ac1 / 2048.0
+        ac2 = ac2 / 2048.0
+        self.current_accel = (ac0, ac1, ac2)
         if self.first_rot == 0:
             self.rotSetCenter()
             self.first_rot = 1
@@ -162,6 +238,10 @@ class Myo(MyoRaw):
             if self.onBoxChange != None:
                 self.onBoxChange(self.last_box, 'off')
                 self.onBoxChange(self.current_box, 'on')
+            for h in self.onBoxChangeList:
+                h(self.last_box, 'off')
+                h(self.current_box, 'on')
+
             self.last_box = self.current_box
 
     def pose_handler(self, p):
@@ -184,10 +264,17 @@ class Myo(MyoRaw):
             self.act_history = str(self.act_history[-100:]) + str(self.PoseToChar(pn))
             if self.locked == False:
                 self.time_to_lock = self.lock_time
-                if self.onPoseEdge != None:
-                    if self.last_pose > -1:
+                if self.last_pose > -1:
+                    if self.onPoseEdge != None:
                         self.onPoseEdge(self.PoseToStr(self.last_pose), 'off')
+                    for h in self.onPoseEdgeList:
+                        h(self.PoseToStr(pn), 'off')
+
+                if self.onPoseEdge != None:
                     self.onPoseEdge(self.PoseToStr(pn), 'on')
+                for h in self.onPoseEdgeList:
+                    h(self.PoseToStr(pn), 'on')
+
             self.last_pose = pn
         if pn == 5 and self.locked and self.use_lock:
             self.locked = False
@@ -195,6 +282,8 @@ class Myo(MyoRaw):
             print('unlock')
             if self.onUnlock != None:
                 self.onUnlock()
+            for h in self.onUnlockList:
+                h()
 
     def getArm(self):
         return self.current_arm
@@ -231,6 +320,8 @@ class Myo(MyoRaw):
         self.vibrate(1)
         if self.onLock != None:
             self.onLock()
+        for h in self.onLockList:
+            h()
 
     def unlock(self, unlock_type):
         if unlock_type == 'timed':
