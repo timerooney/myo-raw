@@ -45,6 +45,7 @@ def plot(scr, vals):
   last_vals = vals
 
 def onOn():
+  pygame.init()
   global scr 
   scr = pygame.display.set_mode((w, h))
   pass
