@@ -9,7 +9,7 @@ import importlib
 import ConfigParser
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 from PyoConnect import *
-myo = Myo(sys.argv[1] if len(sys.argv) >= 2 else None)
+myo = Myo(NNClassifier(), sys.argv[1] if len(sys.argv) >= 2 else None)
 cfg = ConfigParser.SafeConfigParser()
 scriptlist = []
 for filename in os.listdir('./scripts/'):
