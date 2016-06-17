@@ -1,14 +1,15 @@
 #Embedded file name: PyoConnectMenu.py
-import os
-import Tkinter as tk
-from functools import partial
-import subprocess
-import time
-import webbrowser
 import importlib
+import os
+import subprocess
+import webbrowser
+from functools import partial
+
 import ConfigParser
+import Tkinter as tk
+
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
-from PyoConnect import *
+from myoraw.PyoConnect import *
 myo = Myo(NNClassifier(), sys.argv[1] if len(sys.argv) >= 2 else None)
 cfg = ConfigParser.SafeConfigParser()
 scriptlist = []

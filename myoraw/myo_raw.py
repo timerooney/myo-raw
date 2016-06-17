@@ -6,12 +6,10 @@
 		http://www.fernandocosentino.net/pyoconnect
 '''
 
-
 from __future__ import print_function
 
 import enum
 import re
-import struct
 import sys
 import threading
 import time
@@ -19,7 +17,7 @@ import time
 import serial
 from serial.tools.list_ports import comports
 
-from common import *
+from myoraw.common import *
 
 def multichr(ords):
     if sys.version_info[0] >= 3:

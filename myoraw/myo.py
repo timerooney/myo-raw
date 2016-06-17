@@ -1,8 +1,7 @@
 from __future__ import print_function
 
-from collections import Counter, deque
 import sys
-import time
+from collections import Counter, deque
 
 import numpy as np
 
@@ -12,8 +11,8 @@ try:
 except ImportError:
     HAVE_SK = False
 
-from common import *
-from myo_raw import MyoRaw
+from myoraw.common import *
+from myoraw.myo_raw import MyoRaw
 
 SUBSAMPLE = 3
 K = 15

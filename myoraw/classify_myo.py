@@ -1,11 +1,6 @@
 from __future__ import print_function
 
-from collections import Counter
-import struct
 import sys
-import time
-
-import numpy as np
 
 try:
     from sklearn import neighbors, svm
@@ -20,8 +15,9 @@ try:
 except ImportError:
     HAVE_PYGAME = False
 
-from common import *
-import myo
+from myoraw.common import *
+from myoraw import myo
+
 
 class EMGHandler(object):
     def __init__(self, m):
@@ -88,7 +84,7 @@ if __name__ == '__main__':
                 if HAVE_SK and m.cls.nn is not None:
                     dists, inds = m.cls.nn.kneighbors(hnd.emg)
                     for i, (d, ind) in enumerate(zip(dists[0], inds[0])):
-                        y = m.cls.Y[myo.SUBSAMPLE*ind]
+                        y = m.cls.Y[myo.SUBSAMPLE * ind]
                         text(scr, font, '%d %6d' % (y, d), (650, 20 * i))
 
                 pygame.display.flip()

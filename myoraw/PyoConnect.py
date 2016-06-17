@@ -27,13 +27,16 @@
                 // now reboot   
 """
 from __future__ import print_function
-from collections import Counter, deque
+
+import math
+import re
 import sys
 import time
+from collections import Counter, deque
 from subprocess import Popen, PIPE
-import re
-import math
+
 import numpy as np
+
 try:
     from sklearn import neighbors, svm
     HAVE_SK = True
@@ -55,8 +58,8 @@ except:
     print('PyKeyboard error: No keyboard support')
     pkeyboard = None
 
-from common import *
-from myo_raw import MyoRaw, Pose, Arm, XDirection
+from myoraw.common import *
+from myoraw.myo_raw import MyoRaw, Pose, Arm, XDirection
 
 SUBSAMPLE = 3
 K = 15
