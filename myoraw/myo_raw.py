@@ -165,7 +165,7 @@ class BT(object):
 
         while True:
             p = self.recv_packet(timeout)
-
+            print(p)
             ## no timeout, so p won't be None
             if p.typ == 0: return p
 
