@@ -169,11 +169,9 @@ class BT(object):
 
             ## no timeout, so p won't be None
             if p.typ == 0: return p
-            print('Past return p')
 
             ## not a response: must be an event
             self.handle_event(p)
-            print('Event handling')
 
 
 class MyoRaw(object):
@@ -214,6 +212,7 @@ class MyoRaw(object):
         print('scanning...')
         self.bt.discover(timeout)
         while True:
+            print('waiting for a packet')
             p = self.bt.recv_packet()
             print('scan response:', p)
 
