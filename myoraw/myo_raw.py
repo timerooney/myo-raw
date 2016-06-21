@@ -142,8 +142,8 @@ class BT(object):
     def get_connections(self):
         return self.send_command(0, 6)
 
-    def discover(self):
-        return self.send_command(6, 2, b'\x01')
+    def discover(self, timeout=None):
+        return self.send_command(6, 2, b'\x01', timeout)
 
     def end_scan(self):
         return self.send_command(6, 4)
@@ -159,12 +159,12 @@ class BT(object):
         self.send_command(4, 5, pack('BHB', con, attr, len(val)) + val)
         return self.wait_event(4, 1)
 
-    def send_command(self, cls, cmd, payload=b'', wait_resp=True):
+    def send_command(self, cls, cmd, payload=b'', timeout=None):
         s = pack('4B', 0, len(payload), cls, cmd) + payload
         self.ser.write(s)
 
         while True:
-            p = self.recv_packet()
+            p = self.recv_packet(timeout)
 
             ## no timeout, so p won't be None
             if p.typ == 0: return p
@@ -200,7 +200,7 @@ class MyoRaw(object):
     def run(self, timeout=None):
         self.bt.recv_packet(timeout)
 
-    def connect(self):
+    def connect(self, timeout=None):
         ## stop everything from before
         self.bt.end_scan()
         self.bt.disconnect(0)
@@ -209,7 +209,7 @@ class MyoRaw(object):
 
         ## start scanning
         print('scanning...')
-        self.bt.discover()
+        self.bt.discover(timeout)
         while True:
             p = self.bt.recv_packet()
             print('scan response:', p)
