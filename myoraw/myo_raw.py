@@ -165,7 +165,6 @@ class BT(object):
 
         while True:
             p = self.recv_packet(timeout)
-            print('Packet received')
 
             ## no timeout, so p won't be None
             if p.typ == 0: return p
@@ -210,10 +209,9 @@ class MyoRaw(object):
 
         ## start scanning
         print('scanning...')
-        self.bt.discover(timeout)
+        self.bt.discover()
         while True:
-            print('waiting for a packet')
-            p = self.bt.recv_packet()
+            p = self.bt.recv_packet(timeout)
             print('scan response:', p)
 
             if p.payload.endswith(b'\x06\x42\x48\x12\x4A\x7F\x2C\x48\x47\xB9\xDE\x04\xA9\x01\x00\x06\xD5'):
