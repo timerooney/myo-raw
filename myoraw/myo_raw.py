@@ -303,7 +303,7 @@ class MyoRaw(object):
                 elif typ == 3: # pose
                     self.on_pose(Pose(val))
             else:
-                print('data with unknown attr: %02X %s' % (attr, p))
+                raise ValueError('data with unknown attr: %02X %s' % (attr, p))
 
         self.bt.add_handler(handle_data)
 
