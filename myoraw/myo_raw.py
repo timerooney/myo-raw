@@ -72,9 +72,9 @@ class BT(object):
         self.handlers = []
 
     ## internal data-handling methods
-    def recv_packet(self, timeout=None):
+    def recv_packet(self, timeout=None, bt_timeout=None):
         t0 = time.time()
-        self.ser.timeout = None
+        self.ser.timeout = bt_timeout
         while timeout is None or time.time() < t0 + timeout:
             if timeout is not None: self.ser.timeout = t0 + timeout - time.time()
             c = self.ser.read()
@@ -149,7 +149,7 @@ class BT(object):
         return self.send_command(6, 4)
 
     def disconnect(self, h):
-        return self.send_command(3, 0, pack('B', h))
+        return self.send_command(3, 0, pack('B', h), bt_timeout=5)
 
     def read_attr(self, con, attr):
         self.send_command(4, 4, pack('BH', con, attr))
@@ -159,12 +159,12 @@ class BT(object):
         self.send_command(4, 5, pack('BHB', con, attr, len(val)) + val)
         return self.wait_event(4, 1)
 
-    def send_command(self, cls, cmd, payload=b'', timeout=None):
+    def send_command(self, cls, cmd, payload=b'', timeout=None, bt_timeout=None):
         s = pack('4B', 0, len(payload), cls, cmd) + payload
         self.ser.write(s)
 
         while True:
-            p = self.recv_packet(timeout)
+            p = self.recv_packet(timeout, bt_timeout)
 
             ## no timeout, so p won't be None
             if p.typ == 0: return p
